@@ -106,8 +106,39 @@ require('lazy').setup({
     },
   },
 'neovim/nvim-lspconfig',
-'hrsh7th/nvim-cmp',
-'hrsh7th/cmp-nvim-lsp',
+
+{
+    'saghen/blink.cmp',
+    version = '1.*',
+    event = 'VimEnter',
+    lazy = false,
+    build = 'cargo build --release',
+--- @module 'blink.cmp'
+--- @type blink.cmp.Config
+    opts = {
+      keymap = {
+        preset = 'super-tab',
+          ['<C-k>'] = { 'select_prev', 'fallback' },
+          ['<C-j>'] = { 'select_next', 'fallback' },
+      },
+      appearance = {
+        nerd_font_variant = 'normal',
+      },
+
+      completion = {
+        documentation = { auto_show = false, auto_show_delay_ms = 500 },
+      },
+
+      sources = {
+        default = { 'lsp', 'path'},
+        providers = {},
+      },
+
+      fuzzy = { implementation = 'rust' },
+
+      signature = { enabled = false },
+    },
+},
 
     { -- Autoformat
     'stevearc/conform.nvim',
@@ -161,36 +192,9 @@ require('lazy').setup({
  end
 
 vim.lsp.enable('zls', {
-    capabilities = require('cmp_nvim_lsp').default_capabilities(),
+    capabilities = require('blink.cmp').get_lsp_capabilities()
 })
 
 vim.lsp.enable('clangd', {
-    capabilities = require('cmp_nvim_lsp').default_capabilities(),
+    capabilities = require('blink.cmp').get_lsp_capabilities()
 })
-
-
-
-local cmp = require'cmp'
-
-  cmp.setup({
-    snippet = {
-      expand = function(args)
-        vim.snippet.expand(args.body) 
-      end,
-    },
-    window = {
-      completion = cmp.config.window.bordered(),
-      documentation = cmp.config.window.bordered(),
-    },
-    mapping = cmp.mapping.preset.insert({
-      ['<C-j>'] = cmp.mapping.scroll_docs(-4),
-      ['<C-k>'] = cmp.mapping.scroll_docs(4),
-      ['<C-Space>'] = cmp.mapping.complete(),
-      ['<C-e>'] = cmp.mapping.abort(),
-      ['<TAB>'] = cmp.mapping.confirm({ select = true }), -- Accept currently selected item. Set `select` to `false` to only confirm explicitly selected items.
-    }),
-    sources = cmp.config.sources({
-      { name = 'nvim_lsp' },
-    }, {
-    })
-  })
