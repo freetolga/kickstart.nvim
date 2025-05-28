@@ -27,7 +27,7 @@ vim.call('plug#begin')
 
 Plug('nvim-lua/plenary.nvim')
 Plug('nvchad/base46')
-Plug('nvchad/ui')
+Plug('nvim-lualine/lualine.nvim')
 Plug('nvim-treesitter/nvim-treesitter')
 Plug('neovim/nvim-lspconfig')
 Plug('saghen/blink.cmp', {['tag'] = 'v1.*'}) Plug('stevearc/conform.nvim')
@@ -38,8 +38,7 @@ vim.call('plug#end')
    dofile(vim.g.base46_cache .. v)
  end
 
-require("nvchad")
-require("base46")
+--require("nvchad")
 
 require('nvim-treesitter.configs').setup({
   auto_install = false,
@@ -58,6 +57,7 @@ require("conform").setup({
     zig = {"zig fmt"},
   },
 })
+
 blink_cmp_opts = {
     keymap = { preset = 'default' },
 
@@ -83,3 +83,8 @@ vim.lsp.enable('clangd', {
     capabilities = require('blink.cmp').get_lsp_capabilities()
 })
 
+require('lualine').setup {
+    options = {
+        theme = "auto"
+    }
+}
