@@ -29,7 +29,7 @@ local options = {
     -- lazyload it when there are 1+ buffers
     tabufline = {
       enabled = false,
-      lazyload = true,
+      lazyload = false,
       order = { "treeOffset", "buffers", "tabs", "btns" },
       modules = nil,
       bufwidth = 21,
