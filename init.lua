@@ -10,14 +10,14 @@ vim.o.breakindent = true
 vim.o.backup = flse
 vim.o.writebackup = false
 vim.o.swapfile = false
-vim.o.hidden = true
+vim.o.hidden = false
 vim.o.autoread = true
 vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
 vim.g.base46_cache = vim.fn.stdpath "data" .. "/base46_cache/"
 vim.g.have_nerd_font = true
 vim.o.number = true
-vim.o.mouse = ''
+vim.o.mouse = 'a'
 vim.o.showmode = false
 vim.schedule(function()
   vim.o.clipboard = 'unnamedplus'
@@ -78,7 +78,7 @@ require('lazy').setup({
 
 
  "nvim-lua/plenary.nvim",
- { "nvim-tree/nvim-web-devicons", lazy = true },
+-- { "nvim-tree/nvim-web-devicons", lazy = true },
  {
    "nvchad/ui",
     config = function()
@@ -105,30 +105,10 @@ require('lazy').setup({
       },
     },
   },
-  {
-        'neovim/nvim-lspconfig',
-        dependencies = {
-            {
-                'hrsh7th/nvim-cmp',
-                snippet = {
-                    expand = function(args)
-                        vim.snippet.expand(args.body) -- For native neovim snippets (Neovim v0.10+)
-                    end,
-                },
-    	        window = {
-      	            completion = bordered,
-      	            documentation = bordered,
-    	    },
-            mapping = {
-                ['<C-Space>'] = complete,
-                ['<C-e>'] = abort,
-            },
-            sources = {
-                { name = 'nvim_lsp' },
-            },
-     }, 'hrsh7th/cmp-nvim-lsp',
-    },
-    },
+'neovim/nvim-lspconfig',
+'hrsh7th/nvim-cmp',
+'hrsh7th/cmp-nvim-lsp',
+
     { -- Autoformat
     'stevearc/conform.nvim',
     event = { 'BufWritePre' },
@@ -184,14 +164,18 @@ vim.lsp.enable('zls', {
     capabilities = require('cmp_nvim_lsp').default_capabilities(),
 })
 
+vim.lsp.enable('clangd', {
+    capabilities = require('cmp_nvim_lsp').default_capabilities(),
+})
+
+
 
 local cmp = require'cmp'
 
   cmp.setup({
     snippet = {
-      -- REQUIRED - you must specify a snippet engine
       expand = function(args)
-        vim.snippet.expand(args.body) -- For native neovim snippets (Neovim v0.10+)
+        vim.snippet.expand(args.body) 
       end,
     },
     window = {
@@ -199,15 +183,14 @@ local cmp = require'cmp'
       documentation = cmp.config.window.bordered(),
     },
     mapping = cmp.mapping.preset.insert({
-      ['<C-b>'] = cmp.mapping.scroll_docs(-4),
-      ['<C-f>'] = cmp.mapping.scroll_docs(4),
+      ['<C-j>'] = cmp.mapping.scroll_docs(-4),
+      ['<C-k>'] = cmp.mapping.scroll_docs(4),
       ['<C-Space>'] = cmp.mapping.complete(),
       ['<C-e>'] = cmp.mapping.abort(),
-      ['<CR>'] = cmp.mapping.confirm({ select = true }), -- Accept currently selected item. Set `select` to `false` to only confirm explicitly selected items.
+      ['<TAB>'] = cmp.mapping.confirm({ select = true }), -- Accept currently selected item. Set `select` to `false` to only confirm explicitly selected items.
     }),
     sources = cmp.config.sources({
       { name = 'nvim_lsp' },
     }, {
-      { name = 'buffer' },
     })
   })

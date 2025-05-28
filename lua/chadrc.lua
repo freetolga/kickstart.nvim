@@ -3,6 +3,7 @@ local options = {
   base46 = {
     theme = "solarized_dark", -- default theme
     transparency = false,
+
     theme_toggle = { },
   },
 
