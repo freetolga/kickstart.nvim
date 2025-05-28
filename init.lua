@@ -6,6 +6,7 @@ vim.o.expandtab = true
 vim.o.smarttab = true
 vim.o.autoindent = true
 vim.o.smartindent = true
+vim.o.breakindent = true
 vim.o.backup = flse
 vim.o.writebackup = false
 vim.o.swapfile = false
@@ -13,46 +14,28 @@ vim.o.hidden = true
 vim.o.autoread = true
 vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
-
 vim.g.base46_cache = vim.fn.stdpath "data" .. "/base46_cache/"
 vim.g.have_nerd_font = true
 vim.o.number = true
-vim.o.mouse = 'a'
-
+vim.o.mouse = ''
 vim.o.showmode = false
 vim.schedule(function()
   vim.o.clipboard = 'unnamedplus'
 end)
-
-vim.o.breakindent = true
-
 vim.o.undofile = false
-
 vim.o.ignorecase = true
 vim.o.smartcase = true
-
 vim.o.signcolumn = 'yes'
-
 vim.o.updatetime = 250
 vim.o.timeoutlen = 300
 vim.o.splitright = true
 vim.o.splitbelow = true
-vim.o.list = true
-vim.opt.listchars = { tab = '» ', trail = '·', nbsp = '␣' }
-
 vim.o.inccommand = 'split'
-
-vim.o.cursorline = false
-vim.o.scrolloff = 10
-
+vim.o.cursorline = true
 vim.o.confirm = true
-
 vim.keymap.set('n', '<Esc>', '<cmd>nohlsearch<CR>')
-
 vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagnostic [Q]uickfix list' })
-
 vim.keymap.set('t', '<Esc><Esc>', '<C-\\><C-n>', { desc = 'Exit terminal mode' })
-
 vim.keymap.set('n', '<C-h>', '<C-w><C-h>', { desc = 'Move focus to the left window' })
 vim.keymap.set('n', '<C-l>', '<C-w><C-l>', { desc = 'Move focus to the right window' })
 vim.keymap.set('n', '<C-j>', '<C-w><C-j>', { desc = 'Move focus to the lower window' })
@@ -146,25 +129,51 @@ require('lazy').setup({
      }, 'hrsh7th/cmp-nvim-lsp',
     },
     },
--- end of plugins
-}, {
-  ui = {
-    icons = vim.g.have_nerd_font and {} or {
-      cmd = '⌘',
-      config = '🛠',
-      event = '📅',
-      ft = '📂',
-      init = '⚙',
-      keys = '🗝',
-      plugin = '🔌',
-      runtime = '💻',
-      require = '🌙',
-      source = '📄',
-      start = '🚀',
-      task = '📌',
-      lazy = '💤 ',
+    { -- Autoformat
+    'stevearc/conform.nvim',
+    event = { 'BufWritePre' },
+    cmd = { 'ConformInfo' },
+    keys = {
+      {
+        '<leader>f',
+        function()
+          require('conform').format { async = true, lsp_format = 'fallback' }
+        end,
+        mode = '',
+        desc = '[F]ormat buffer',
+      },
     },
-  },
+    opts = {
+      notify_on_error = false,
+      format_on_save = function(bufnr)
+        -- Disable "format_on_save lsp_fallback" for languages that don't
+        -- have a well standardized coding style. You can add additional
+        -- languages here or re-enable it for the disabled ones.
+        local disable_filetypes = { c = true, cpp = true }
+        if disable_filetypes[vim.bo[bufnr].filetype] then
+          return nil
+        else
+          return {
+            timeout_ms = 500,
+            lsp_format = 'fallback',
+          }
+        end
+      end,
+      formatters_by_ft = {
+        lua = { 'stylua' },
+        zig = { 'zig fmt' },
+        c = { 'clang-format' },
+        cxx = { 'clang-format' },
+        cpp = { 'clang-format' },
+        -- Conform can also run multiple formatters sequentially
+        -- python = { "isort", "black" },
+        --
+        -- You can use 'stop_after_first' to run the first available formatter from the list
+        -- javascript = { "prettierd", "prettier", stop_after_first = true },
+      }
+}
+},
+-- end of plugins
 })
 
  for _, v in ipairs(vim.fn.readdir(vim.g.base46_cache)) do

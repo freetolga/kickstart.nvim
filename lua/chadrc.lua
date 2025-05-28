@@ -2,38 +2,32 @@ local options = {
 
   base46 = {
     theme = "solarized_dark", -- default theme
-    hl_add = {},
-    hl_override = {},
-    integrations = {},
-    changed_themes = {},
     transparency = false,
-    theme_toggle = { "onedark", "one_light" },
+    theme_toggle = { },
   },
 
   ui = {
     cmp = {
-      icons_left = false, -- only for non-atom styles!
+      icons_left = true, -- only for non-atom styles!
       style = "default", -- default/flat_light/flat_dark/atom/atom_colored
       abbr_maxwidth = 60,
       -- for tailwind, css lsp etc
-      format_colors = { lsp = true, icon = "󱓻" },
+      format_colors = { lsp = false, icon = "󱓻" },
     },
-
-    telescope = { style = "borderless" }, -- borderless / bordered
 
     statusline = {
       enabled = true,
-      theme = "vscode_colored", -- default/vscode/vscode_colored/minimal
+      theme = "default", -- default/vscode/vscode_colored/minimal
       -- default/round/block/arrow separators work only for default statusline theme
       -- round and block will work for minimal theme only
-      separator_style = "default",
+      separator_style = "block",
       order = nil,
       modules = nil,
     },
 
     -- lazyload it when there are 1+ buffers
     tabufline = {
-      enabled = true,
+      enabled = false,
       lazyload = true,
       order = { "treeOffset", "buffers", "tabs", "btns" },
       modules = nil,
@@ -41,45 +35,7 @@ local options = {
     },
   },
 
-  nvdash = {
-    load_on_startup = false,
-    header = {
-      "                            ",
-      "     ▄▄         ▄ ▄▄▄▄▄▄▄   ",
-      "   ▄▀███▄     ▄██ █████▀    ",
-      "   ██▄▀███▄   ███           ",
-      "   ███  ▀███▄ ███           ",
-      "   ███    ▀██ ███           ",
-      "   ███      ▀ ███           ",
-      "   ▀██ █████▄▀█▀▄██████▄    ",
-      "     ▀ ▀▀▀▀▀▀▀ ▀▀▀▀▀▀▀▀▀▀   ",
-      "                            ",
-      "     Powered By  eovim    ",
-      "                            ",
-    },
-
-    buttons = {
-      { txt = "  Find File", keys = "ff", cmd = "Telescope find_files" },
-      { txt = "  Recent Files", keys = "fo", cmd = "Telescope oldfiles" },
-      { txt = "󰈭  Find Word", keys = "fw", cmd = "Telescope live_grep" },
-      { txt = "󱥚  Themes", keys = "th", cmd = ":lua require('nvchad.themes').open()" },
-      { txt = "  Mappings", keys = "ch", cmd = "NvCheatsheet" },
-
-      { txt = "─", hl = "NvDashFooter", no_gap = true, rep = true },
-
-      {
-        txt = function()
-          local stats = require("lazy").stats()
-          local ms = math.floor(stats.startuptime) .. " ms"
-          return "  Loaded " .. stats.loaded .. "/" .. stats.count .. " plugins in " .. ms
-        end,
-        hl = "NvDashFooter",
-        no_gap = true,
-      },
-
-      { txt = "─", hl = "NvDashFooter", no_gap = true, rep = true },
-    },
-  },
+  nvdash = {},
 
   term = {
     base46_colors = true,
@@ -107,7 +63,7 @@ local options = {
   colorify = {
     enabled = true,
     mode = "virtual", -- fg, bg, virtual
-    virt_text = "󱓻 ",
+--    virt_text = "󱓻 ",
     highlight = { hex = true, lspvars = true },
   },
 }
