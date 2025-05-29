@@ -1,3 +1,5 @@
+vim.g.mapleader = ' '
+vim.g.maplocalleader = ' '
 vim.o.number = true
 vim.o.cp = false
 vim.o.tabstop = 4
@@ -22,6 +24,13 @@ vim.o.ignorecase = true
 vim.o.smartcase = true
 vim.o.cursorline = true
 
+-- clipboard sync --
+vim.schedule(function()
+  vim.o.clipboard = 'unnamedplus'
+end)
+
+-- Keep signcolumn on by default --
+vim.o.signcolumn = 'yes'
 local Plug = vim.fn['plug#']
 vim.call('plug#begin')
 
