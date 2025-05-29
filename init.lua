@@ -89,13 +89,33 @@ blink_cmp_opts = {
 }
 require('blink.cmp').setup(blink_cmp_opts)
 
-vim.lsp.enable('zls', {
+local lsp_opts = {
     capabilities = require('blink.cmp').get_lsp_capabilities()
-})
+}
 
-vim.lsp.enable('clangd', {
-    capabilities = require('blink.cmp').get_lsp_capabilities()
-})
+vim.lsp.enable('zls', lsp_opts)
+
+vim.lsp.enable('clangd', lsp_opts)
+
+vim.diagnostic.config {
+        severity_sort = true,
+        float = { border = 'rounded', source = 'if_many' },
+        underline = { severity = vim.diagnostic.severity.ERROR },
+        virtual_text = {
+          source = 'if_many',
+          spacing = 2,
+          format = function(diagnostic)
+            local diagnostic_message = {
+              [vim.diagnostic.severity.ERROR] = diagnostic.message,
+              [vim.diagnostic.severity.WARN] = diagnostic.message,
+              [vim.diagnostic.severity.INFO] = diagnostic.message,
+              [vim.diagnostic.severity.HINT] = diagnostic.message,
+            }
+            return diagnostic_message[diagnostic.severity]
+          end,
+        },
+}
+
 
 require('lualine').setup {
     options = {
