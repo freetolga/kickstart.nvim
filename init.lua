@@ -10,45 +10,42 @@ vim.o.smarttab = true
 vim.o.autoindent = true
 vim.o.smartindent = true
 vim.o.breakindent = true
-vim.o.backup = flse
+vim.o.backup = false
 vim.o.writebackup = false
 vim.o.swapfile = false
 vim.o.hidden = false
 vim.o.autoread = true
-vim.g.base46_cache = vim.fn.stdpath "data" .. "/base46_cache/"
 vim.g.have_nerd_font = true
-vim.o.mouse = 'a'
+vim.o.mouse = ''
 vim.o.showmode = false
 vim.o.undofile = false
 vim.o.ignorecase = true
 vim.o.smartcase = true
 vim.o.cursorline = true
+vim.o.background = 'dark'
 
 -- clipboard sync --
 vim.schedule(function()
   vim.o.clipboard = 'unnamedplus'
 end)
 
--- Keep signcolumn on by default --
+-- Keep signcolumn(the extra space in the number column) on by default --
 vim.o.signcolumn = 'yes'
 local Plug = vim.fn['plug#']
 vim.call('plug#begin')
 
 Plug('nvim-lua/plenary.nvim')
 Plug('nvim-lualine/lualine.nvim')
+Plug('echasnovski/mini.statusline')
 Plug('nvim-treesitter/nvim-treesitter')
 Plug('neovim/nvim-lspconfig')
 Plug('dense-analysis/ale')
-Plug('saghen/blink.cmp', {['tag'] = 'v1.*'}) Plug('stevearc/conform.nvim')
-
+Plug('saghen/blink.cmp', {['tag'] = 'v1.*'})
+Plug('stevearc/conform.nvim')
+Plug('Mofiqul/vscode.nvim')
 vim.call('plug#end')
 
- for _, v in ipairs(vim.fn.readdir(vim.g.base46_cache)) do
-   dofile(vim.g.base46_cache .. v)
- end
-
---require("nvchad")
-
+require('mini.statusline').setup()
 require('nvim-treesitter.configs').setup({
   auto_install = false,
   ignore_install = { "all" },
@@ -57,7 +54,6 @@ require('nvim-treesitter.configs').setup({
     additional_vim_regex_highlighting = false,
   },
 })
-
 
 require("conform").setup({
   formatters_by_ft = {
@@ -72,7 +68,7 @@ require("conform").setup({
     cmd = { 'ConformInfo' },
     keys = {
       {
-        '<leader>f',
+        '<space>f',
         function()
           require('conform').format { async = true, lsp_format = 'fallback' }
         end,
@@ -80,30 +76,23 @@ require("conform").setup({
         desc = '[F]ormat buffer',
       },
     },
+
 formatters = {
-				clang_format = {
-					args = function()
-						-- Fetch indentation settings dynamically
-						local shiftwidth = vim.api.nvim_get_option("shiftwidth")
-						local expandtab = vim.api.nvim_get_option("expandtab")
-
-						-- Build args based on Vim settings
-						local args = { "--style={BasedOnStyle: llvm, " }
-
-						-- Add tab width based on shiftwidth
-						table.insert(args, "IndentWidth: " .. shiftwidth)
-
-						-- Use tabs or keep spaces
-						if expandtab then
-							table.insert(args, ", TabWidth: " .. shiftwidth)
-							table.insert(args, ", UseTabs: Always")
-						end
-
-						table.insert(args, " }")
-						return args
-					end,
-				},
-			},
+	clang_format = {
+		args = function()
+			local shiftwidth = vim.api.nvim_get_option("shiftwidth")
+			local expandtab = vim.api.nvim_get_option("expandtab")
+			local args = { "--style={BasedOnStyle: llvm, " }
+			table.insert(args, "IndentWidth: " .. shiftwidth)
+			if expandtab then
+				table.insert(args, ", TabWidth: " .. shiftwidth)
+				table.insert(args, ", UseTabs: Always")
+			end
+			table.insert(args, " }")
+			return args
+		end,
+	},
+},
 
 })
 
@@ -158,20 +147,32 @@ vim.diagnostic.config {
 }
 
 
-require('lualine').setup {
-    options = {
-        theme = "auto"
-    }
+require('lualine')
+local g = vim.g
+
+g.ale_ruby_rubocop_auto_correct_all = 1
+
+g.ale_linters = {
+    ruby = {'rubocop', 'ruby'},
+    lua = {'lua_language_server'},
+    cpp = {'cppcheck', 'clang-tidy'},
+    c = {'cppcheck', 'clang-tidy'},
 }
--- Configuration goes here.
-        local g = vim.g
-
-        g.ale_ruby_rubocop_auto_correct_all = 1
-
-        g.ale_linters = {
-            ruby = {'rubocop', 'ruby'},
-            lua = {'lua_language_server'},
-            cpp = {'cppcheck', 'clang-tidy'},
-            c = {'cppcheck', 'clang-tidy'},
-        }
 g.ale_use_neovim_diagnostics_api = 1
+
+local c = require('vscode.colors').get_colors()
+require('vscode').setup({
+    transparent = false,
+    italic_comments = true,
+    underline_links = true,
+    disable_nvimtree_bg = true,
+    terminal_colors = false,
+    color_overrides = {
+        vscLineNumber = '#FFFFFF',
+    },
+    group_overrides = {
+        Cursor = { fg=c.vscDarkBlue, bg=c.vscLightGreen, bold=true },
+    }
+})
+require('vscode').load()
+vim.cmd.colorscheme "vscode"
