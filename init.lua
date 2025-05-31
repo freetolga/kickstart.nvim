@@ -10,19 +10,19 @@ vim.o.smarttab = true
 vim.o.autoindent = true
 vim.o.smartindent = true
 vim.o.breakindent = true
-vim.o.backup = flse
+vim.o.backup = false
 vim.o.writebackup = false
 vim.o.swapfile = false
 vim.o.hidden = false
 vim.o.autoread = true
-vim.g.base46_cache = vim.fn.stdpath "data" .. "/base46_cache/"
 vim.g.have_nerd_font = true
-vim.o.mouse = 'a'
+vim.o.mouse = ''
 vim.o.showmode = false
 vim.o.undofile = false
 vim.o.ignorecase = true
 vim.o.smartcase = true
 vim.o.cursorline = true
+vim.o.background = 'dark'
 
 -- clipboard sync --
 vim.schedule(function()
@@ -36,19 +36,15 @@ vim.call('plug#begin')
 
 Plug('nvim-lua/plenary.nvim')
 Plug('nvim-lualine/lualine.nvim')
+Plug('echasnovski/mini.statusline')
 Plug('nvim-treesitter/nvim-treesitter')
 Plug('neovim/nvim-lspconfig')
 Plug('dense-analysis/ale')
-Plug('saghen/blink.cmp', {['tag'] = 'v1.*'}) Plug('stevearc/conform.nvim')
-
+Plug('saghen/blink.cmp', {['tag'] = 'v1.*'})
+Plug('stevearc/conform.nvim')
+Plug('Mofiqul/vscode.nvim')
 vim.call('plug#end')
-
- for _, v in ipairs(vim.fn.readdir(vim.g.base46_cache)) do
-   dofile(vim.g.base46_cache .. v)
- end
-
---require("nvchad")
-
+require('mini.statusline').setup()
 require('nvim-treesitter.configs').setup({
   auto_install = false,
   ignore_install = { "all" },
@@ -72,7 +68,7 @@ require("conform").setup({
     cmd = { 'ConformInfo' },
     keys = {
       {
-        '<leader>f',
+        '<space>f',
         function()
           require('conform').format { async = true, lsp_format = 'fallback' }
         end,
@@ -158,20 +154,53 @@ vim.diagnostic.config {
 }
 
 
-require('lualine').setup {
-    options = {
-        theme = "auto"
-    }
-}
+require('lualine')
 -- Configuration goes here.
-        local g = vim.g
+local g = vim.g
 
-        g.ale_ruby_rubocop_auto_correct_all = 1
+g.ale_ruby_rubocop_auto_correct_all = 1
 
-        g.ale_linters = {
-            ruby = {'rubocop', 'ruby'},
-            lua = {'lua_language_server'},
-            cpp = {'cppcheck', 'clang-tidy'},
-            c = {'cppcheck', 'clang-tidy'},
-        }
+g.ale_linters = {
+    ruby = {'rubocop', 'ruby'},
+    lua = {'lua_language_server'},
+    cpp = {'cppcheck', 'clang-tidy'},
+    c = {'cppcheck', 'clang-tidy'},
+}
 g.ale_use_neovim_diagnostics_api = 1
+
+local c = require('vscode.colors').get_colors()
+require('vscode').setup({
+    -- Alternatively set style in setup
+    -- style = 'light'
+
+    -- Enable transparent background
+    transparent = false,
+
+    -- Enable italic comment
+    italic_comments = true,
+
+    -- Underline `@markup.link.*` variants
+    underline_links = true,
+
+    -- Disable nvim-tree background color
+    disable_nvimtree_bg = true,
+
+    -- Apply theme colors to terminal
+    terminal_colors = true,
+
+    -- Override colors (see ./lua/vscode/colors.lua)
+    color_overrides = {
+        vscLineNumber = '#FFFFFF',
+    },
+
+    -- Override highlight groups (see ./lua/vscode/theme.lua)
+    group_overrides = {
+        -- this supports the same val table as vim.api.nvim_set_hl
+        -- use colors from this colorscheme by requiring vscode.colors!
+        Cursor = { fg=c.vscDarkBlue, bg=c.vscLightGreen, bold=true },
+    }
+})
+require('vscode').load()
+
+-- load the theme without affecting devicon colors.
+vim.cmd.colorscheme "vscode"
