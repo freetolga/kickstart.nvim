@@ -35,10 +35,10 @@ local Plug = vim.fn['plug#']
 vim.call('plug#begin')
 
 Plug('nvim-lua/plenary.nvim')
-Plug('nvchad/base46')
 Plug('nvim-lualine/lualine.nvim')
 Plug('nvim-treesitter/nvim-treesitter')
 Plug('neovim/nvim-lspconfig')
+Plug('dense-analysis/ale')
 Plug('saghen/blink.cmp', {['tag'] = 'v1.*'}) Plug('stevearc/conform.nvim')
 
 vim.call('plug#end')
@@ -64,7 +64,47 @@ require("conform").setup({
     lua = { "stylua" },
     rust = { "rustfmt", lsp_format = "fallback" },
     zig = {"zig fmt"},
+    cpp = {"clang-format"},
+    c = {"clang-format"},
+    arduino = {"clang-format"},
   },
+    event = { 'BufWritePre' },
+    cmd = { 'ConformInfo' },
+    keys = {
+      {
+        '<leader>f',
+        function()
+          require('conform').format { async = true, lsp_format = 'fallback' }
+        end,
+        mode = '',
+        desc = '[F]ormat buffer',
+      },
+    },
+formatters = {
+				clang_format = {
+					args = function()
+						-- Fetch indentation settings dynamically
+						local shiftwidth = vim.api.nvim_get_option("shiftwidth")
+						local expandtab = vim.api.nvim_get_option("expandtab")
+
+						-- Build args based on Vim settings
+						local args = { "--style={BasedOnStyle: llvm, " }
+
+						-- Add tab width based on shiftwidth
+						table.insert(args, "IndentWidth: " .. shiftwidth)
+
+						-- Use tabs or keep spaces
+						if expandtab then
+							table.insert(args, ", TabWidth: " .. shiftwidth)
+							table.insert(args, ", UseTabs: Always")
+						end
+
+						table.insert(args, " }")
+						return args
+					end,
+				},
+			},
+
 })
 
 blink_cmp_opts = {
@@ -94,8 +134,9 @@ local lsp_opts = {
 }
 
 vim.lsp.enable('zls', lsp_opts)
-
 vim.lsp.enable('clangd', lsp_opts)
+vim.lsp.enable('gopls', lsp_opts)
+vim.lsp.enable('arduino_language_server')
 
 vim.diagnostic.config {
         severity_sort = true,
@@ -122,3 +163,15 @@ require('lualine').setup {
         theme = "auto"
     }
 }
+-- Configuration goes here.
+        local g = vim.g
+
+        g.ale_ruby_rubocop_auto_correct_all = 1
+
+        g.ale_linters = {
+            ruby = {'rubocop', 'ruby'},
+            lua = {'lua_language_server'},
+            cpp = {'cppcheck', 'clang-tidy'},
+            c = {'cppcheck', 'clang-tidy'},
+        }
+g.ale_use_neovim_diagnostics_api = 1
